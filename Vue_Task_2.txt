@@ -1,0 +1,137 @@
+/*
+ * Selengkapnya ada di projek vue3-test
+ *
+ * Files: 
+ *	- vue3-test/src/composables/news.js
+ *	- vue3-test/src/views/TaskTwoView.vue
+ *	- vue3-test/src/components/MySelect.vue
+ */
+
+===================
+|    news.js      |
+===================
+
+import { ref, toValue, watchEffect } from "vue"
+
+export function useNews(options) {
+    const { country, category } = options
+
+    const news = ref(null)
+    const error = ref(null)
+    const loading = ref(null)
+
+    watchEffect(() => {
+        if (toValue(country) != null && toValue(category) != null) {
+            loading.value = true
+
+            news.value = null
+            error.value = null
+
+            fetch(`https://newsapi.org/v2/top-headlines?country=${toValue(country)}&category=${toValue(category)}&apiKey=548e1897c60f4951b014f60d73f87383`)
+                .then((res) => res.json())
+                .then((json) => {
+                    news.value = json
+                    loading.value = false
+                })
+                .catch((err) => {
+                    error.value = err
+                    loading.value = false
+                })
+        }
+    })
+
+
+    return { news, error, loading }
+
+}
+
+====================
+|    App.vue	   |
+====================
+
+<script setup>
+import { ref } from 'vue';
+import { useNews } from '../composables/news'
+import MySelect from '../components/MySelect.vue'
+
+const country = ref(null)
+const category = ref(null)
+
+const { news, error, loading } = useNews({ country: country, category: category })
+
+</script>
+
+<template>
+    <div class="p-5">
+        <h1 class="text-3xl font-semibold mb-2">News List</h1>
+
+        <div class="py-5 flex flex-row justify-end">
+            <MySelect v-model="country" :options="[
+                { text: 'Indonesia', value: 'id' },
+                { text: 'United State', value: 'us' },
+                { text: 'Singapore', value: 'sg' },
+                { text: 'China', value: 'cn' },
+                { text: 'Rusia', value: 'ru' }
+            ]" :label-text="'-- Choose Country --'" />
+
+            <MySelect v-model="category" :options="[
+                { text: 'Business', value: 'business' },
+                { text: 'Entertainment', value: 'entertainment' },
+                { text: 'General', value: 'general' },
+                { text: 'Health', value: 'health' },
+                { text: 'Science', value: 'science' },
+                { text: 'Sports', value: 'sports' },
+                { text: 'Technology', value: 'technology' },
+            ]" :label-text="'-- Choose Category --'" />
+        </div>
+
+        <div v-if="loading">Loading...</div>
+        <div v-else-if="error">
+            Something went wrong
+        </div>
+        <div v-else-if="news">
+            <div v-for="article of news.articles" class="py-2">
+                <h3 class="font-bold text-blue-950">{{ article.title }}</h3>
+                <div class="flex flex-row justify-between">
+                    <span class="text-sm text-green-700">{{ article.source.name }}</span>
+                    <a target="_blank" :href="article.url" class="hover:underline text-sm text-blue-500">Source</a>
+                </div>
+                <p class="font-thin">{{ article.description ?? 'No description' }}</p>
+            </div>
+        </div>
+        <div v-else>No Data</div>
+    </div>
+</template>
+
+<style scoped></style>
+
+========================
+|     MySelect.vue     |
+========================
+
+<script setup>
+const emit = defineEmits(['update:modelValue'])
+const props = defineProps({
+    modelValue: {
+        type: String,
+        default: null
+    },
+    options: {
+        type: Array,
+        required: true
+    },
+    labelText: {
+        type: String,
+        required: true
+    },
+})
+</script>
+
+<template>
+    <select class="py-2 px-4 border mr-5" :value="modelValue" @change="$emit('update:modelValue', $event.target.value)">
+        <option value="" :selected="(modelValue == null)">{{ labelText }}</option>
+        <option v-for="(opt, i) in props.options" :value="opt.value" :selected="(modelValue == 'id')" :key="i">{{ opt.text }}</option>
+    </select>
+</template>
+
+<style scoped></style>

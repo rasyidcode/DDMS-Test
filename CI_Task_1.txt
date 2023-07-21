@@ -1,0 +1,108 @@
+/*
+ * Selengkapnya ada di projek ci4-test
+ *
+ * Files: 
+ *	- ci4-test/app/Controllers/Hobbies.php
+ */
+
+==============================
+| index() - GET api/hobbies  |
+==============================
+public function index()
+{
+    return send_success($this->model->findAll());
+}
+
+=================================
+| show() - GET api/hobbies/{id} |
+=================================
+public function show($id = null)
+{
+    $hobby = $this->model->find($id);
+    if (is_null($hobby)) {
+        return send_error(['Not found'], ResponseInterface::HTTP_NOT_FOUND);
+    }
+
+
+    return $this->respond([
+        'success'   => true,
+        'data'      => $hobby
+    ]);
+}
+
+===================================
+| update() - PUT api/hobbies/{id} |
+===================================
+if (!$this->validate([
+    'nama'  => 'required|min_length[3]',
+    'hobi'  => 'required|min_length[5]',
+])) {
+    return $this->respond([
+        'success'   => false,
+        'errors'    => $this->validator->getErrors()
+    ], ResponseInterface::HTTP_BAD_REQUEST);
+}
+
+$hobby = $this->model->find($id);
+if (is_null($hobby)) {
+    return $this->respond([
+        'success'   => false,
+        'error'    => 'Not found'
+    ], ResponseInterface::HTTP_NOT_FOUND);
+}
+
+$json = $this->request->getJSON();
+
+$hobby->nama = $json->nama;
+$hobby->hobi = $json->hobi;
+
+$this->model->save($hobby);
+
+return $this->respond([
+    'success'   => true,
+    'message'   => 'Hobi telah diperbaharui'
+]);
+
+====================================
+| create() - POST api/hobbies/{id} |
+====================================
+if (!$this->validate([
+    'nama'  => 'required|is_unique[hobi.nama]|min_length[3]',
+    'hobi'  => 'required|min_length[5]',
+])) {
+    return $this->respond([
+        'success'   => false,
+        'errors'    => $this->validator->getErrors()
+    ], ResponseInterface::HTTP_BAD_REQUEST);
+}
+
+$json = $this->request->getJSON();
+
+
+$hobi = new HobbyEntity();
+$hobi->nama = $json->nama;
+$hobi->hobi = $json->hobi;
+$this->model->save($hobi);
+
+return $this->respond([
+    'success'   => true,
+    'message'   => 'Hobi telah ditambahkan'
+]);
+
+======================================
+| delete() - DELETE api/hobbies/{id} |
+======================================
+$hobby = $this->model->find($id);
+if (is_null($hobby)) {
+    return $this->respond([
+        'success'   => false,
+        'error'    => 'Not found'
+    ], ResponseInterface::HTTP_NOT_FOUND);
+}
+
+$this->model->delete($id);
+
+return $this->respond([
+    'success'   => true,
+    'message'   => 'Hobi telah dihapus'
+]);

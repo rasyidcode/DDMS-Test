@@ -1,0 +1,62 @@
+/*
+ * Selengkapnya ada di projek ci4-test
+ *
+ * Files: 
+ *	- ci4-test/app/Helpers/rest_api_helper.php
+ *	- ci4-test/app/Controllers/Hobbies.php
+ */
+
+=============================
+|    rest_api_helper.php    |
+=============================
+
+<?php
+
+use CodeIgniter\HTTP\ResponseInterface;
+
+if (!function_exists('send_success')) {
+    function send_success(array $data, int $statusCode = ResponseInterface::HTTP_OK): ResponseInterface
+    {
+        return response()
+            ->setContentType('application/json')
+            ->setJSON([
+                'success'   => true,
+                'data'      => $data
+            ])
+            ->setStatusCode($statusCode);
+    }
+}
+
+if (!function_exists('send_error')) {
+    function send_error(array $errors, int $statusCode = ResponseInterface::HTTP_INTERNAL_SERVER_ERROR): ResponseInterface
+    {
+        return response()
+            ->setContentType('application/json')
+            ->setJSON([
+                'success'   => false,
+                'errors'    => $errors
+            ])
+            ->setStatusCode($statusCode);
+    }
+}
+
+===============
+|    usage    |
+===============
+
+// Hobbies::index()
+public function index()
+{
+    return send_success($this->model->findAll());
+}
+
+// Hobbies::show()
+$hobby = $this->model->find($id);
+if (is_null($hobby)) {
+    return send_error(['Not found'], ResponseInterface::HTTP_NOT_FOUND);
+}
+
+return $this->respond([
+    'success'   => true,
+    'data'      => $hobby
+]);

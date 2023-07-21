@@ -1,0 +1,96 @@
+/*
+ * Selengkapnya ada di projek ci4-test
+ *
+ * Files: 
+ *	- ci4-test/app/Entities/HobbyEntity.php
+ *	- ci4-test/app/Models/HobbyModel.php
+ */
+
+=========================
+|    HobbyEntity.php    |
+=========================
+
+<?php
+
+namespace App\Entities;
+
+use CodeIgniter\Entity\Entity;
+
+class HobbyEntity extends Entity
+{
+    protected $datamap = [];
+    protected $dates   = ['created_at'];
+    protected $casts   = [];
+}
+
+========================
+|    HobbyModel.php    |
+========================
+
+<?php
+
+namespace App\Models;
+
+use App\Entities\HobbyEntity;
+use CodeIgniter\Model;
+
+class HobbyModel extends Model
+{
+    protected $DBGroup          = 'default';
+    protected $table            = 'hobi';
+    protected $primaryKey       = 'id';
+    protected $useAutoIncrement = true;
+    protected $returnType       = HobbyEntity::class;
+    protected $useSoftDeletes   = false;
+    protected $protectFields    = true;
+    protected $allowedFields    = ['nama', 'hobi'];
+
+    // Dates
+    protected $useTimestamps = true;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = null;
+    protected $deletedField  = null;
+
+    // Validation
+    protected $validationRules      = [];
+    protected $validationMessages   = [];
+    protected $skipValidation       = false;
+    protected $cleanValidationRules = true;
+
+    // Callbacks
+    protected $allowCallbacks = true;
+    protected $beforeInsert   = [];
+    protected $afterInsert    = [];
+    protected $beforeUpdate   = [];
+    protected $afterUpdate    = [];
+    protected $beforeFind     = [];
+    protected $afterFind      = [];
+    protected $beforeDelete   = [];
+    protected $afterDelete    = [];
+}
+
+===============
+|    usage    |
+===============
+
+// Hobbies::create()
+$hobi = new HobbyEntity();
+$hobi->nama = $json->nama;
+$hobi->hobi = $json->hobi;
+$this->model->save($hobi);
+
+// Hobies::update()
+$hobby = $this->model->find($id);
+if (is_null($hobby)) {
+    return $this->respond([
+        'success'   => false,
+        'error'    => 'Not found'
+    ], ResponseInterface::HTTP_NOT_FOUND);
+}
+
+$json = $this->request->getJSON()
+$hobby->nama = $json->nama;
+$hobby->hobi = $json->hobi;
+
+$this->model->save($hobby);
