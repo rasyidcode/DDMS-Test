@@ -8,12 +8,17 @@
 ```shell
 npm install
 npm run dev
+// buka http://localhost:5173/ di browser
 ```
 
 ## Cara menjalankan ci4-test
 ```shell
 composer install
+cp env .env
+// sesuaikan config database di .env dan set app.baseURL ke http://localhost:8080, dan CI_ENVIRONMENT ke development
 php spark migrate
+php spark serve // untuk menjalankan projek nya
+// buka http://localhost:8080/ di browser
 ```
 
 ## Cara menjalan hello-world-app
