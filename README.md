@@ -2,6 +2,7 @@
 
 - Source code test vue js ada di vue3-test
 - Source code test ci4 ada di ci4-test
+- Source code test cordova ada di hello-world-app
 
 ## Cara menjalankan vue3-test
 ```shell
@@ -13,6 +14,12 @@ npm run dev
 ```shell
 composer install
 php spark migrate
+```
+
+## Cara menjalan hello-world-app
+```shell
+cordova platform add android
+cordova run android
 ```
 
 ## Petunjuk
